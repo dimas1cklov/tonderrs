@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dating Profile Scanner — prank app</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!--
+  Prank / motion demo. Nothing here is real: no search happens, every profile is made up.
+  Settings: edit CONFIG below.
+-->
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#0E060C;font-family:Inter,system-ui,sans-serif;color:#fff}
+body{display:flex;align-items:center;justify-content:center}
+.phone{position:relative;width:390px;height:844px;max-width:100vw;max-height:100vh;overflow:hidden;background:#1A0B17;border-radius:40px}
+@media (max-width:430px){.phone{width:100vw;height:100vh;border-radius:0}}
+.blob{position:absolute;border-radius:50%;animation:drift 8s ease-in-out infinite;pointer-events:none}
+.b1{left:-120px;top:-80px;width:420px;height:420px;background:radial-gradient(circle,rgba(170,40,110,.55),rgba(170,40,110,0) 70%)}
+.b2{right:-140px;bottom:-60px;width:460px;height:460px;background:radial-gradient(circle,rgba(140,30,100,.5),rgba(140,30,100,0) 70%);animation-delay:-4s}
+.stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 24px}
+.foot{position:absolute;left:0;right:0;bottom:28px;text-align:center;font-size:11px;font-weight:600;letter-spacing:.08em;color:#B79AAD}
+
+@keyframes drift{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-20px)}}
+@keyframes ticks{to{transform:rotate(360deg)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-120%)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes pop{0%{opacity:0;transform:scale(.7)}70%{transform:scale(1.06)}100%{opacity:1;transform:none}}
+@keyframes tap{0%{transform:scale(.2);opacity:.85}100%{transform:scale(2.6);opacity:0}}
+.rise{animation:rise .45s ease both}
+.pop{animation:pop .5s ease both}
+.slide{animation:slideIn .55s cubic-bezier(.2,.8,.2,1) both}
+
+.col{width:100%;display:flex;flex-direction:column;gap:12px}
+.center{align-items:center;text-align:center}
+.kicker{font-size:13px;font-weight:700;letter-spacing:.14em;color:#F49AC1}
+h1{margin:0;font-size:30px;font-weight:800;line-height:1.15;letter-spacing:-.02em}
+.muted{margin:0;font-size:16px;line-height:1.5;color:#D9C2D0;max-width:290px}
+
+.btn{position:relative;overflow:hidden;height:56px;border:0;border-radius:999px;background:#F49AC1;color:#1A0B17;font:700 17px Inter,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s ease;width:100%}
+.btn.pressed{transform:scale(.94)}
+.btn:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.ripple{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:rgba(255,255,255,.9);pointer-events:none;animation:tap .55s ease-out both}
+
+.field{display:flex;align-items:center;gap:10px;height:60px;padding:0 22px 0 8px;border-radius:999px;background:#FBF4F8}
+.field input{flex:1;min-width:0;height:56px;border:0;background:transparent;font:500 17px Inter,sans-serif;color:#1A0B17;outline:none}
+.field input::placeholder{color:#9A7E92}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+.at{position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;overflow:hidden;background:linear-gradient(145deg,#FF6FA5,#B0306E);box-shadow:inset 0 2px 0 rgba(255,255,255,.35),inset 0 -3px 6px rgba(0,0,0,.18)}
+
+.pill{width:100%;display:flex;align-items:center;border-radius:999px;background:#FBF4F8;color:#1A0B17}
+.found{gap:14px;height:76px;padding:0 22px 0 10px}
+.avatar{position:relative;width:56px;height:56px;flex-shrink:0}
+.avatar .ph{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#B0306E;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff}
+.avatar .badge{position:absolute;right:-4px;bottom:-4px;width:24px;height:24px;border-radius:8px;border:2px solid #FBF4F8;font-size:13px}
+.name{font-size:18px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.status{display:flex;align-items:center;gap:6px;font-size:13px;color:#4A3A45}
+.dot{width:8px;height:8px;border-radius:50%;background:#1FA968;flex-shrink:0}
+
+.spinner{position:relative;width:110px;height:110px;animation:ticks 1s steps(12) infinite}
+.spinner i{position:absolute;left:51px;top:0;width:8px;height:28px;border-radius:999px;background:#fff;transform-origin:4px 55px}
+.pct{font-size:22px;font-weight:600}
+
+.logo{position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 2px 0 rgba(255,255,255,.35),inset 0 -4px 8px rgba(0,0,0,.18),0 6px 14px var(--sh);background:var(--bg)}
+.logo::before{content:"";position:absolute;left:3px;right:3px;top:2px;height:45%;border-radius:14px 14px 50% 50%;background:linear-gradient(180deg,rgba(255,255,255,.38),rgba(255,255,255,0))}
+.logo svg{position:relative;filter:drop-shadow(0 2px 2px rgba(0,0,0,.22))}
+.scanrow{display:flex;gap:14px;margin-top:14px}
+.scanrow .logo{width:52px;height:52px;border-radius:15px;transition:opacity .3s ease,transform .3s ease}
+
+.head{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:10px}
+.head .ph{width:84px;height:84px;border-radius:50%;object-fit:cover;border:3px solid #F49AC1;background:#B0306E;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700}
+.big{font-size:34px;font-weight:800;letter-spacing:-.02em;line-height:1.1;text-align:center}
+.big b{color:#F49AC1}
+.list{position:relative;width:100%}
+.rows{display:flex;flex-direction:column;gap:14px;transition:filter .7s ease}
+.rows.blur{filter:blur(9px)}
+.row{gap:14px;height:78px;padding:0 22px 0 9px}
+.row .logo{width:60px;height:60px;border-radius:18px}
+.row .site{font-size:19px;font-weight:800}
+.row .match{font-size:20px;font-weight:800;color:#B0306E}
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.overlay .btn{width:auto;height:58px;padding:0 32px;box-shadow:0 12px 32px rgba(0,0,0,.4)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="blob b1" aria-hidden="true"></div>
+  <div class="blob b2" aria-hidden="true"></div>
+  <main class="stage" id="stage" aria-live="polite"></main>
+  <div class="foot">FOR FUN ONLY · ALL RESULTS ARE FAKE</div>
+</div>
+
+<script>
+// ===== Settings =====
+const CONFIG = {
+  autoplay: true,         // true = plays by itself in a loop (for screen recording); false = click through manually
+  demoNick: 'dan.k_17',   // username typed in autoplay
+  speed: 1,               // 0.5 slower … 3 faster
+  photo: 'https://cdn.imagetourls.com/uploads/tyImg/1eE9AIK4l.png', // Фото из вашего запроса
+};
+
+// ===== Updated platforms =====
+const SITES = [
+  { name: 'Tinder', bg: 'transparent', sh: 'rgba(255,100,100,.35)', online: 'Online now', match: 97,
+    img: 'https://cdn.imagetourls.com/uploads/tyImg/s4iPGLrp.png' },
+  { name: 'Mamba', bg: 'transparent', sh: 'rgba(255,100,100,.35)', online: 'Active 3 min ago', match: 91,
+    img: 'https://cdn.imagetourls.com/uploads/tyImg/QS1UE2L7.png' },
+  { name: 'Badoo', bg: 'transparent', sh: 'rgba(100,100,255,.35)', online: 'Online now', match: 87,
+    img: 'https://cdn.imagetourls.com/uploads/tyImg/Dtmm1A7J.png' },
+  { name: 'Flirtic', bg: 'linear-gradient(145deg,#FFC14D,#FF7A1F 55%,#E5530C)', sh: 'rgba(255,122,31,.45)', online: 'Active 12 min ago', match: 79,
+    svg: '<path d="M5 9.5a4.5 4.5 0 014.5-4.5h13A4.5 4.5 0 0127 9.5v8a4.5 4.5 0 01-4.5 4.5H16l-6.5 5.5V22a4.5 4.5 0 01-4.5-4.5z" fill="#FFF"/><path d="M16 18.4l-3.9-3.7a2.5 2.5 0 013.9-3.1 2.5 2.5 0 013.9 3.1z" fill="#F26A1B"/>' },
+];
+
+const ARROW = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+const CHECK = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1FA968" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+const stage = document.getElementById('stage');
+const S = { phase: 'intro', nick: '', pct: 0, blurred: false };
+let timers = [], interval = null;
+
+const esc = t => String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const nickShown = () => (S.nick || '').replace(/^@+/, '').trim() || 'username';
+const sp = ms => ms / CONFIG.speed;
+const later = (fn, ms) => timers.push(setTimeout(fn, sp(ms)));
+function stopAll() { timers.forEach(clearTimeout); timers = []; if (interval) clearInterval(interval); interval = null; }
+
+function logo(s, px) { 
+  if(s.img) {
+    return `<div class="logo" style="--bg:${s.bg};--sh:${s.sh};background:transparent;"><img src="${s.img}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" alt="${s.name}"></div>`;
+  }
+  return `<div class="logo" style="--bg:${s.bg};--sh:${s.sh}"><svg width="${px}" height="${px}" viewBox="0 0 32 32" fill="none" aria-hidden="true">${s.svg}</svg></div>`; 
+}
+function photo(cls) {
+  const letter = esc(nickShown().charAt(0).toUpperCase());
+  if (!CONFIG.photo) return `<div class="ph ${cls || ''}">${letter}</div>`;
+  return `<img class="ph" src="${esc(CONFIG.photo)}" alt="Profile photo" onerror="this.outerHTML='<div class=&quot;ph&quot;>${letter}</div>'">`;
+}
+
+// ===== Screens =====
+function render() {
+  const n = esc(nickShown());
+  let html = '';
+  if (S.phase === 'intro') html = `
+    <div class="col center rise">
+      <div class="kicker">JUST FOR FUN</div>
+      <h1>This is a prank app</h1>
+      <p class="muted">Nothing here is real. No search happens, and every profile you see is made up.</p>
+      <button class="btn" id="okBtn" style="margin-top:16px">OK</button>
+    </div>`;
+  if (S.phase === 'input') html = `
+    <div class="col rise">
+      <label for="nick" class="sr">username</label>
+      <div class="field">
+        <div class="at" style="width:44px;height:44px;border-radius:13px;background:none;box-shadow:none;"><img src="https://cdn.imagetourls.com/uploads/tyImg/14KnhaJet.png" style="width:100%;height:100%;object-fit:cover;border-radius:13px;"></div>
+        <input id="nick" placeholder="username" autocomplete="off" value="${esc(S.nick)}">
+      </div>
+      <button class="btn" id="searchBtn">Search ${ARROW}</button>
+    </div>`;
+  if (S.phase === 'found') html = `
+    <div class="pill found pop">
+      <div class="avatar">${photo()}<div class="at badge" aria-hidden="true" style="background:none;box-shadow:none;"><img src="https://cdn.imagetourls.com/uploads/tyImg/14KnhaJet.png" style="width:100%;height:100%;object-fit:cover;border-radius:8px;"></div></div>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+        <div class="name">@${n}</div>
+        <div class="status"><span class="dot"></span>Account found</div>
+      </div>${CHECK}
+    </div>`;
+  if (S.phase === 'scan') {
+    const ticks = Array.from({ length: 12 }, (_, i) => `<i style="transform:rotate(${i * 30}deg);opacity:${(0.25 + i / 11 * 0.75).toFixed(2)}"></i>`).join('');
+    const icons = SITES.map((s, i) => { const hit = S.pct >= (i + 1) * 24; return `<div style="opacity:${hit ? 1 : .25};transform:scale(${hit ? 1.08 : .9});transition:all .3s ease">${logo(s, 32)}</div>`; }).join('');
+    html = `
+    <div class="col center">
+      <div class="spinner" aria-hidden="true">${ticks}</div>
+      <div class="pct">${Math.floor(S.pct)}%</div>
+      <div style="font-size:14px;color:#D9C2D0">Checking dating sites…</div>
+      <div class="scanrow">${icons}</div>
+    </div>`;
+  }
+  if (S.phase === 'results') {
+    const rows = SITES.map((s, i) => `
+      <div class="pill row slide" style="animation-delay:${0.3 + i * 0.2}s">
+        ${logo(s, 38)}
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+          <div class="site">${s.name}</div>
+          <div class="status"><span class="dot"></span>${s.online}</div>
+        </div>
+        <div class="match">${s.match}%</div>
+      </div>`).join('');
+    html = `
+    <div class="col" style="gap:14px">
+      <div class="head pop">
+        ${photo()}
+        <div style="font-size:17px;font-weight:600;color:#D9C2D0">@${n}</div>
+        <div class="big"><b>4</b> dating profiles<br>found</div>
+      </div>
+      <div class="list">
+        <div class="rows ${S.blurred ? 'blur' : ''}">${rows}</div>
+        ${S.blurred ? `<div class="overlay"><button class="btn pop" id="showBtn">Show their profiles ${ARROW}</button></div>` : ''}
+      </div>
+    </div>`;
+  }
+  stage.innerHTML = html;
+  bind();
+}
+
+// Updates during the scan without re-triggering entry animations
+function updateScan() {
+  const p = stage.querySelector('.pct'); if (p) p.textContent = Math.floor(S.pct) + '%';
+  stage.querySelectorAll('.scanrow > div').forEach((el, i) => { const hit = S.pct >= (i + 1) * 24; el.style.opacity = hit ? 1 : .25; el.style.transform = `scale(${hit ? 1.08 : .9})`; });
+}
+
+function bind() {
+  const ok = document.getElementById('okBtn');
+  if (ok) ok.onclick = () => { if (!CONFIG.autoplay) { S.phase = 'input'; render(); document.getElementById('nick').focus(); } };
+  const inp = document.getElementById('nick');
+  if (inp) inp.oninput = e => { S.nick = e.target.value; };
+  const sb = document.getElementById('searchBtn');
+  if (sb) sb.onclick = () => { if (!CONFIG.autoplay) search(() => later(() => { S.blurred = true; render(); }, 2000)); };
+  const show = document.getElementById('showBtn');
+  if (show) show.onclick = () => tap('showBtn');
+}
+
+// Visual "tap": ripple + press
+function tap(id, then) {
+  const b = document.getElementById(id);
+  if (b) { b.classList.add('pressed'); const r = document.createElement('span'); r.className = 'ripple'; b.appendChild(r); }
+  timers.push(setTimeout(() => { if (b) b.classList.remove('pressed'); if (then) then(); }, 420));
+}
+
+function search(done) {
+  S.blurred = false; S.phase = 'found'; S.pct = 0; render();
+  later(() => {
+    S.phase = 'scan'; S.pct = 0; render();
+    interval = setInterval(() => {
+      S.pct = Math.min(100, S.pct + 3 * CONFIG.speed);
+      updateScan();
+      if (S.pct >= 100) { clearInterval(interval); interval = null; S.phase = 'results'; render(); if (done) done(); }
+    }, 40);
+  }, 1100);
+}
+
+// ===== Autoplay sequence =====
+function play() {
+  stopAll();
+  Object.assign(S, { phase: 'intro', nick: '', pct: 0, blurred: false }); render();
+  later(() => tap('okBtn', () => {
+    S.phase = 'input'; render();
+    const nick = CONFIG.demoNick; let i = 0;
+    const step = Math.max(45, 1100 / Math.max(1, nick.length));
+    const typeNext = () => {
+      i++; S.nick = nick.slice(0, i);
+      const el = document.getElementById('nick'); if (el) el.value = S.nick;
+      if (i < nick.length) return later(typeNext, step);
+      later(() => tap('searchBtn', () => search(() => {
+        later(() => { S.blurred = true; render(); later(() => tap('showBtn', () => later(play, 1600)), 1300); }, 2000);
+      })), 350);
+    };
+    later(typeNext, 300);
+  }), 1100);
+}
+
+if (CONFIG.autoplay) play(); else render();
+</script>
+</body>
+</html>
